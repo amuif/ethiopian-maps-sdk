@@ -1,0 +1,13 @@
+{
+  "name": "@ethiopiamaps/glyphs",
+  "version": "0.1.0",
+  "description": "Signed Distance Field (SDF) glyph generator for Ge'ez and Latin bilingual map cartography",
+  "main": "build-glyphs.js",
+  "type": "module",
+  "scripts": {
+    "build": "node build-glyphs.js",
+    "test": "node test-coverage.js"
+  },
+  "author": "amuif (Ibrahim)",
+  "license": "MIT"
+}

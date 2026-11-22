@@ -1,0 +1,53 @@
+name: Build and Publish Glyph Fontstacks
+
+on:
+  push:
+    paths:
+      - 'glyphs/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build-glyphs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install glyph builder
+        run: cargo install build_pbf_glyphs
+
+      - name: Install dependencies
+        run: pnpm install --filter @ethiopiamaps/glyphs
+
+      - name: Build glyph fontstacks
+        run: pnpm --filter @ethiopiamaps/glyphs build
+
+      - name: Test glyph coverage
+        run: pnpm --filter @ethiopiamaps/glyphs test
+
+      - name: Package glyph archive
+        run: |
+          tar -czf glyphs-dist.tar.gz -C glyphs/dist .
+
+      - name: Attach glyph archive to latest release
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          LATEST_TAG=$(gh release list --limit 1 | awk '{print $1}')
+          if [ -n "${LATEST_TAG}" ]; then
+            gh release upload "${LATEST_TAG}" glyphs-dist.tar.gz --clobber || true
+          fi

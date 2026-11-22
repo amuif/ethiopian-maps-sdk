@@ -1,0 +1,29 @@
+# Node dependencies
+node_modules/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build artifacts & downloads
+*.osm.pbf
+*.osm.pbf.md5
+*.pmtiles
+*.jar
+planetiler.jar
+planetiler-data/
+data/
+tmp/
+*.log
+
+# Glyph build artifacts
+glyphs/dist/
+glyphs/tmp/
+
+# OS and Editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo

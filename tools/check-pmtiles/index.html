@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ethiopian Maps SDK — PMTiles Endpoint Validator</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --success: #10b981;
+      --error: #ef4444;
+      --warn: #f59e0b;
+      --accent: #3b82f6;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      margin: 0;
+      padding: 2rem 1rem;
+    }
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+    p.lead {
+      color: var(--muted);
+      margin-top: 0;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .input-group {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    input[type="url"] {
+      flex: 1;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      color: var(--text);
+      font-size: 1rem;
+    }
+    button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .check-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .check-item:last-child {
+      border-bottom: none;
+    }
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .status-pending { background: #334155; color: #cbd5e1; }
+    .status-pass { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+    .status-fail { background: rgba(239, 68, 68, 0.2); color: var(--error); }
+    .status-warn { background: rgba(245, 158, 11, 0.2); color: var(--warn); }
+    pre {
+      background: #090d16;
+      border: 1px solid var(--border);
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      color: #38bdf8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>PMTiles Endpoint Validator</h1>
+    <p class="lead">Verify that your static storage bucket (Cloudflare R2, S3, Nginx) properly supports HTTP byte-range requests and CORS headers required by MapLibre.</p>
+
+    <div class="card">
+      <label for="url-input"><strong>Target PMTiles URL:</strong></label>
+      <div class="input-group">
+        <input type="url" id="url-input" placeholder="https://r2.example.com/ethiopia.pmtiles" required>
+        <button id="validate-btn" onclick="runValidation()">Validate Endpoint</button>
+      </div>
+    </div>
+
+    <div class="card" id="results-card" style="display: none;">
+      <h3>Validation Results</h3>
+      
+      <div class="check-item">
+        <div>
+          <strong>[1] HEAD Request & Accept-Ranges</strong><br>
+          <small class="muted" id="details-head">Verifying Accept-Ranges: bytes header...</small>
+        </div>
+        <span class="status-badge status-pending" id="badge-head">Pending</span>
+      </div>
+
+      <div class="check-item">
+        <div>
+          <strong>[2] HTTP 206 Partial Content (Range: bytes=0-1023)</strong><br>
+          <small class="muted" id="details-range">Fetching initial 1024-byte header chunk...</small>
+        </div>
+        <span class="status-badge status-pending" id="badge-range">Pending</span>
+      </div>
+
+      <div class="check-item">
+        <div>
+          <strong>[3] CORS Header Access-Control-Allow-Origin</strong><br>
+          <small class="muted" id="details-cors">Testing browser cross-origin policy...</small>
+        </div>
+        <span class="status-badge status-pending" id="badge-cors">Pending</span>
+      </div>
+
+      <div class="check-item">
+        <div>
+          <strong>[4] Expose Headers (Content-Range)</strong><br>
+          <small class="muted" id="details-expose">Checking Access-Control-Expose-Headers...</small>
+        </div>
+        <span class="status-badge status-pending" id="badge-expose">Pending</span>
+      </div>
+
+      <div id="remediation-block" style="margin-top: 1.5rem; display: none;">
+        <h4>Remediation Snippets</h4>
+        <p>If CORS or byte-range checks failed, configure your storage provider:</p>
+        <strong>Cloudflare R2 / AWS S3 CORS Policy:</strong>
+        <pre>[
+  {
+    "AllowedOrigins": ["*"],
+    "AllowedMethods": ["GET", "HEAD"],
+    "AllowedHeaders": ["Range", "*"],
+    "ExposeHeaders": ["Content-Range", "Accept-Ranges", "Content-Length"],
+    "MaxAgeSeconds": 86400
+  }
+]</pre>
+        <strong>Nginx Configuration:</strong>
+        <pre>add_header Accept-Ranges bytes;
+add_header Access-Control-Allow-Origin *;
+add_header Access-Control-Allow-Headers "Range, Origin, Content-Type";
+add_header Access-Control-Expose-Headers "Content-Range, Content-Length, Accept-Ranges";</pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function runValidation() {
+      const url = document.getElementById('url-input').value.trim();
+      if (!url) return;
+
+      const btn = document.getElementById('validate-btn');
+      btn.disabled = true;
+      btn.innerText = 'Validating...';
+
+      document.getElementById('results-card').style.display = 'block';
+      let hasError = false;
+
+      // 1. Fetch range bytes=0-1023
+      try {
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: { 'Range': 'bytes=0-1023' }
+        });
+
+        // Check CORS
+        const badgeCors = document.getElementById('badge-cors');
+        badgeCors.className = 'status-badge status-pass';
+        badgeCors.innerText = 'PASS';
+        document.getElementById('details-cors').innerText = 'Cross-origin fetch succeeded.';
+
+        // Check status
+        const badgeRange = document.getElementById('badge-range');
+        if (response.status === 206) {
+          badgeRange.className = 'status-badge status-pass';
+          badgeRange.innerText = 'PASS (206)';
+          document.getElementById('details-range').innerText = 'Received HTTP 206 Partial Content.';
+        } else {
+          badgeRange.className = 'status-badge status-fail';
+          badgeRange.innerText = `FAIL (${response.status})`;
+          document.getElementById('details-range').innerText = `Expected HTTP 206, got status ${response.status}.`;
+          hasError = true;
+        }
+
+        // Check headers
+        const acceptRanges = response.headers.get('accept-ranges');
+        const badgeHead = document.getElementById('badge-head');
+        if (acceptRanges && acceptRanges.includes('bytes')) {
+          badgeHead.className = 'status-badge status-pass';
+          badgeHead.innerText = 'PASS';
+          document.getElementById('details-head').innerText = 'Accept-Ranges: bytes is present.';
+        } else {
+          badgeHead.className = 'status-badge status-warn';
+          badgeHead.innerText = 'WARN';
+          document.getElementById('details-head').innerText = 'Accept-Ranges header not explicitly visible (may be unexposed).';
+        }
+
+        // Check Content-Range
+        const contentRange = response.headers.get('content-range');
+        const badgeExpose = document.getElementById('badge-expose');
+        if (contentRange) {
+          badgeExpose.className = 'status-badge status-pass';
+          badgeExpose.innerText = 'PASS';
+          document.getElementById('details-expose').innerText = `Content-Range exposed: ${contentRange}`;
+        } else {
+          badgeExpose.className = 'status-badge status-warn';
+          badgeExpose.innerText = 'WARN';
+          document.getElementById('details-expose').innerText = 'Content-Range header not exposed in browser context.';
+          hasError = true;
+        }
+
+      } catch (err) {
+        hasError = true;
+        const badgeCors = document.getElementById('badge-cors');
+        badgeCors.className = 'status-badge status-fail';
+        badgeCors.innerText = 'FAIL (CORS)';
+        document.getElementById('details-cors').innerText = `Fetch failed: ${err.message}. Likely missing CORS headers.`;
+
+        const badgeRange = document.getElementById('badge-range');
+        badgeRange.className = 'status-badge status-fail';
+        badgeRange.innerText = 'BLOCKED';
+      }
+
+      if (hasError) {
+        document.getElementById('remediation-block').style.display = 'block';
+      }
+
+      btn.disabled = false;
+      btn.innerText = 'Validate Endpoint';
+    }
+  </script>
+</body>
+</html>

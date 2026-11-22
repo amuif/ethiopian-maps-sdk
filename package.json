@@ -1,0 +1,24 @@
+{
+  "name": "ethiopian-maps-sdk-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Decentralized open-source vector map publishing suite for Ethiopia",
+  "author": "amuif (Ibrahim)",
+  "license": "MIT",
+  "scripts": {
+    "start": "pnpm --filter ethiopian-maps-react-demo build && node tools/serve.js",
+    "serve": "node tools/serve.js",
+    "dev:react": "pnpm --filter ethiopian-maps-react-demo dev",
+    "build:adapter": "pnpm --filter @ethiopiamaps/adapter build",
+    "build:glyphs": "pnpm --filter @ethiopiamaps/glyphs build",
+    "validate:styles": "gl-style-validate styles/ethiopia-bilingual.json && gl-style-validate styles/ethiopia-amharic.json",
+    "test:diagnostic": "bash tools/check-pmtiles/cli.sh --help",
+    "test:coverage": "node glyphs/test-coverage.js"
+  },
+  "devDependencies": {
+    "@maplibre/maplibre-gl-style-spec": "^21.0.0",
+    "typescript": "^5.4.5"
+  },
+  "packageManager": "pnpm@10.12.1"
+}

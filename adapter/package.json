@@ -1,0 +1,28 @@
+{
+  "name": "@ethiopiamaps/adapter",
+  "version": "0.1.0",
+  "description": "Composite local-to-remote hot-swapping PMTiles adapter for MapLibre GL",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "pnpm run build",
+    "test": "pnpm build && node test.mjs"
+  },
+  "author": "amuif (Ibrahim)",
+  "license": "MIT",
+  "peerDependencies": {
+    "maplibre-gl": ">=3.0.0",
+    "pmtiles": ">=3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "maplibre-gl": "^4.1.2",
+    "pmtiles": "^3.0.6",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "effect": "^4.1.5"
+  }
+}

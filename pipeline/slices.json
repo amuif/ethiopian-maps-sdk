@@ -1,0 +1,166 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "addis_ababa",
+        "name_en": "Addis Ababa & Sheger",
+        "name_am": "አዲስ አበባ እና ሸገር",
+        "output_filename": "addis_ababa.pmtiles",
+        "description": "Addis Ababa metropolitan area including Sheger urban fringe and Bole Airport corridor",
+        "bbox": [38.60, 8.80, 38.95, 9.15]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [38.60, 8.80],
+            [38.95, 8.80],
+            [38.95, 9.15],
+            [38.60, 9.15],
+            [38.60, 8.80]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "dire_dawa",
+        "name_en": "Dire Dawa",
+        "name_am": "ድሬዳዋ",
+        "output_filename": "dire_dawa.pmtiles",
+        "description": "Dire Dawa chartered city and logistics corridor",
+        "bbox": [41.75, 9.50, 42.00, 9.70]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [41.75, 9.50],
+            [42.00, 9.50],
+            [42.00, 9.70],
+            [41.75, 9.70],
+            [41.75, 9.50]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "hawassa",
+        "name_en": "Hawassa",
+        "name_am": "ሀዋሳ",
+        "output_filename": "hawassa.pmtiles",
+        "description": "Hawassa city and surrounding lakefront economic zone",
+        "bbox": [38.40, 6.95, 38.60, 7.15]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [38.40, 6.95],
+            [38.60, 6.95],
+            [38.60, 7.15],
+            [38.40, 7.15],
+            [38.40, 6.95]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "bahir_dar",
+        "name_en": "Bahir Dar",
+        "name_am": "ባሕር ዳር",
+        "output_filename": "bahir_dar.pmtiles",
+        "description": "Bahir Dar metropolitan area and Lake Tana southern shore",
+        "bbox": [37.30, 11.50, 37.48, 11.68]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [37.30, 11.50],
+            [37.48, 11.50],
+            [37.48, 11.68],
+            [37.30, 11.68],
+            [37.30, 11.50]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "gondar",
+        "name_en": "Gondar",
+        "name_am": "ጎንደር",
+        "output_filename": "gondar.pmtiles",
+        "description": "Gondar historical city and commercial center",
+        "bbox": [37.40, 12.55, 37.55, 12.68]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [37.40, 12.55],
+            [37.55, 12.55],
+            [37.55, 12.68],
+            [37.40, 12.68],
+            [37.40, 12.55]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "mekelle",
+        "name_en": "Mekelle",
+        "name_am": "መቐለ",
+        "output_filename": "mekelle.pmtiles",
+        "description": "Mekelle city hub",
+        "bbox": [39.42, 13.45, 39.55, 13.56]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [39.42, 13.45],
+            [39.55, 13.45],
+            [39.55, 13.56],
+            [39.42, 13.56],
+            [39.42, 13.45]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "adama",
+        "name_en": "Adama & Bishoftu",
+        "name_am": "አዳማ እና ቢሾፍቱ",
+        "output_filename": "adama.pmtiles",
+        "description": "Adama / Nazret and Bishoftu expressway industrial corridor",
+        "bbox": [38.90, 8.45, 39.35, 8.85]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [38.90, 8.45],
+            [39.35, 8.45],
+            [39.35, 8.85],
+            [38.90, 8.85],
+            [38.90, 8.45]
+          ]
+        ]
+      }
+    }
+  ]
+}

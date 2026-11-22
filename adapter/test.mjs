@@ -1,0 +1,16 @@
+import assert from 'node:assert';
+import { CompositePMTilesProtocol } from './dist/index.js';
+const mk = (impl) => ({ getZxy: impl });
+const ac = new AbortController(); const url = 'x://a/10/600/500';
+const p = new CompositePMTilesProtocol({ remoteUrl: 'http://x/r.pmtiles' });
+p.remotePMTiles = mk(async () => ({ data: 'R' }));
+p.localPMTiles = mk(async () => ({ data: 'L' }));
+assert.deepEqual(await p.tile({ url }, ac), { data: 'L' });
+p.localPMTiles = mk(async () => { throw new Error('io'); });
+assert.deepEqual(await p.tile({ url }, ac), { data: 'R' });
+p.localPMTiles = mk(async () => undefined);
+p.remotePMTiles = mk(async () => undefined);
+assert.equal((await p.tile({ url }, ac)).data.length, 0);
+p.remotePMTiles = mk(async () => { throw new Error('net'); });
+await assert.rejects(p.tile({ url }, ac));
+console.log('ok');
