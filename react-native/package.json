@@ -1,0 +1,33 @@
+{
+  "name": "@ethiopiamaps/react-native",
+  "version": "0.1.0",
+  "description": "Ethiopian bilingual vector maps for React Native, online or fully offline via PMTiles",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rm -rf src/styles && mkdir -p src/styles && cp ../styles/ethiopia-bilingual.json ../styles/ethiopia-amharic.json src/styles/ && tsc",
+    "prepublishOnly": "pnpm run build",
+    "test": "pnpm build && node test.mjs"
+  },
+  "author": "amuif (Ibrahim)",
+  "license": "MIT",
+  "peerDependencies": {
+    "@maplibre/maplibre-react-native": ">=11.0.0",
+    "react": ">=19.1.0",
+    "react-native": ">=0.80.0"
+  },
+  "dependencies": {
+    "@ethiopiamaps/adapter": "workspace:*"
+  },
+  "devDependencies": {
+    "@maplibre/maplibre-react-native": "^11.5.1",
+    "@types/react": "^19.1.0",
+    "react": "19.3.0",
+    "react-native": "0.88.1",
+    "typescript": "^5.4.5"
+  }
+}

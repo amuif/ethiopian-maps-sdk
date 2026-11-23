@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "Ethiopian Maps",
+    "slug": "ethiopian-maps-expo-demo",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "ios": { "bundleIdentifier": "org.ethiopiamaps.demo" },
+    "android": { "package": "org.ethiopiamaps.demo" },
+    "plugins": ["@maplibre/maplibre-react-native"]
+  }
+}

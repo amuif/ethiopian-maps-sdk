@@ -1,0 +1,10 @@
+import assert from 'node:assert';
+import { createNativeStyle } from './dist/style.js';
+const styleJson = { sources: { s: { type: 'vector', url: 'pmtiles://{PMTILES_URL}' } }, glyphs: '{BASE_URL}/glyphs/{fontstack}/{range}.pbf' };
+let s = createNativeStyle({ pmtilesUrl: '/data/app/addis.pmtiles', baseUrl: '/data/app/', styleJson });
+assert.equal(s.sources.s.url, 'pmtiles://file:///data/app/addis.pmtiles');
+assert.equal(s.glyphs, 'file:///data/app/glyphs/{fontstack}/{range}.pbf');
+s = createNativeStyle({ pmtilesUrl: 'https://cdn.x/ethiopia.pmtiles', baseUrl: 'https://cdn.x', styleJson });
+assert.equal(s.sources.s.url, 'pmtiles://https://cdn.x/ethiopia.pmtiles');
+assert.throws(() => createNativeStyle({ pmtilesUrl: 'addis.pmtiles', baseUrl: 'https://cdn.x', styleJson }), /pmtilesUrl/);
+console.log('ok');

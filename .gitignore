@@ -27,3 +27,6 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+
+# Styles copied in at build time
+react-native/src/styles/

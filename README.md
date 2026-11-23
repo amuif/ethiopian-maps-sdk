@@ -114,12 +114,16 @@ ethiopian-maps-sdk/
 │   ├── src/index.ts             # Composite local/remote PMTiles adapter
 │   ├── package.json             # @ethiopiamaps/adapter package definition
 │   └── tsconfig.json            # TypeScript build configuration
+├── react-native/
+│   ├── src/index.tsx            # <EthiopiaMap> for @maplibre/maplibre-react-native
+│   └── src/style.ts             # Style builder for remote or file:// archives
 ├── tools/
 │   └── check-pmtiles/
 │       ├── cli.sh               # Terminal CORS & byte-range validator
 │       └── index.html           # Web diagnostic interface
 ├── examples/
 │   ├── web-react/               # Modern React map viewer application
+│   ├── expo/                    # Expo (React Native) dev-build demo
 │   └── web-vanilla/             # Minimal vanilla HTML/JS reference
 └── docs/
     ├── hosting-guide.md         # Deployment on Cloudflare R2, S3, Nginx, MinIO

@@ -109,7 +109,38 @@ class OfflineMapScreen extends StatelessWidget {
 
 ---
 
-## 4. Web & Hybrid Mobile (React Native / Capacitor)
+## 4. React Native (`@ethiopiamaps/react-native`)
+
+Built on `@maplibre/maplibre-react-native` v11+ (Expo 54+ or bare RN 0.80+). MapLibre Native reads `pmtiles://` itself, so no protocol handler is needed.
+
+```bash
+pnpm add @ethiopiamaps/react-native @maplibre/maplibre-react-native
+```
+
+```tsx
+import { EthiopiaMap } from '@ethiopiamaps/react-native';
+
+// Online: stream the nationwide archive
+<EthiopiaMap
+  pmtilesUrl="https://tiles.yourdomain.et/ethiopia.pmtiles"
+  baseUrl="https://tiles.yourdomain.et"
+  language="amharic"
+/>
+
+// Offline: point at files already on the device
+<EthiopiaMap
+  pmtilesUrl={`${documentDir}/tiles/addis_ababa.pmtiles`}
+  baseUrl={`${documentDir}/map`} // contains glyphs/ and sprites/
+/>
+```
+
+For full offline use, copy the archive plus `glyphs/` (from `glyphs/dist`) and `sprites/` onto the device, for example on first launch with `expo-file-system`. Bare absolute paths get `file://` added. The default camera is Addis Ababa; pass `initialViewState` to change it. All other `Map` props and children (sources, layers, annotations) pass through. An "© OpenStreetMap contributors" credit is always shown.
+
+**Limitation:** each map uses one archive. The local/remote hot swap of `@ethiopiamaps/adapter` is not available on React Native, because MapLibre Native has no JS protocol hook. Choose the city slice when offline and the national URL when online.
+
+---
+
+## 5. Web & Hybrid (WebView / Capacitor)
 
 For web applications or WebView-based frameworks, use `@ethiopiamaps/adapter` to enable automatic hot-swapping between the local bundled slice and remote streaming:
 

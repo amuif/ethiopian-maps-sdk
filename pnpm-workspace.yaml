@@ -1,4 +1,5 @@
 packages:
   - 'adapter'
   - 'glyphs'
+  - 'react-native'
   - 'examples/*'
