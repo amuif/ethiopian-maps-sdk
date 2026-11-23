@@ -32,5 +32,18 @@ services:
       - "8080:8080"
     restart: unless-stopped
 
+  # Turn-by-turn routing (car, motorbike, bicycle, foot); builds its graph from the same extract
+  routing:
+    image: ghcr.io/valhalla/valhalla-scripted:3.9.3
+    environment:
+      tile_urls: *pbf
+      build_elevation: "False"
+    volumes:
+      - valhalla-data:/custom_files
+    ports:
+      - "8002:8002"
+    restart: unless-stopped
+
 volumes:
   nominatim-data:
+  valhalla-data:
