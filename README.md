@@ -117,6 +117,9 @@ ethiopian-maps-sdk/
 ├── react-native/
 │   ├── src/index.tsx            # <EthiopiaMap> for @maplibre/maplibre-react-native
 │   └── src/style.ts             # Style builder for remote or file:// archives
+├── services/                    # @ethiopiamaps/services: search & routing clients
+├── stack/
+│   └── docker-compose.yml       # Tiles + Nominatim search + Valhalla routing
 ├── tools/
 │   └── check-pmtiles/
 │       ├── cli.sh               # Terminal CORS & byte-range validator
@@ -147,7 +150,8 @@ bash tools/check-pmtiles/cli.sh https://tiles.yourdomain.et/ethiopia.pmtiles
 ## Documentation
 
 * [Self-Hosting Guide](docs/hosting-guide.md): Deploying on Cloudflare R2, AWS S3, Nginx, and MinIO.
-* [Mobile Offline Guide](docs/offline-guide.md): Bundling PMTiles into Android, iOS, and Flutter.
+* [Mobile Offline Guide](docs/offline-guide.md): Bundling PMTiles into Android, iOS, Flutter and React Native.
+* [Self-Hosted Stack](docs/stack-guide.md): One-command Docker bundle for tiles, search and routing, plus the `@ethiopiamaps/services` client.
 * [Design Document](docs/designs/ethiopian_maps_sdk.md): Approved technical specification.
 
 ---

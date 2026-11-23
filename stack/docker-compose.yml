@@ -1,0 +1,36 @@
+# Full self-hosted stack: `docker compose -f stack/docker-compose.yml up -d` from the repo root.
+# First start imports Ethiopia from Geofabrik; expect tens of minutes before search answers.
+name: ethiopiamaps
+
+x-pbf: &pbf https://download.geofabrik.de/africa/ethiopia-latest.osm.pbf
+
+services:
+  # Tiles, styles, glyphs, sprites in the published layout (same server as `pnpm serve`).
+  # shortcut: plain Node static server, put a CDN or Caddy in front for public traffic
+  tiles:
+    image: node:22-alpine
+    working_dir: /repo
+    command: node tools/serve.js
+    volumes:
+      - ..:/repo:ro
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+  # Geocoding (forward + reverse), Amharic via accept-language=am
+  search:
+    image: mediagis/nominatim:5.3
+    environment:
+      PBF_URL: *pbf
+      REPLICATION_URL: https://download.geofabrik.de/africa/ethiopia-updates/
+      NOMINATIM_PASSWORD: ${NOMINATIM_PASSWORD:-change-me}
+      IMPORT_STYLE: full
+    volumes:
+      - nominatim-data:/var/lib/postgresql/16/main
+    shm_size: 1g
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+volumes:
+  nominatim-data:
