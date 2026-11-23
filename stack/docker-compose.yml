@@ -44,6 +44,26 @@ services:
       - "8002:8002"
     restart: unless-stopped
 
+  # Optional live-traffic plugin: `docker compose -f stack/docker-compose.yml --profile traffic up -d`
+  # Needs `pnpm install && pnpm --filter "@ethiopiamaps/traffic..." build` on the host first.
+  traffic:
+    profiles: ["traffic"]
+    image: node:22-alpine
+    working_dir: /repo
+    command: node traffic/dist/server.js
+    environment:
+      VALHALLA_URL: http://routing:8002
+      TRAFFIC_INGEST_TOKEN: ${TRAFFIC_INGEST_TOKEN:-} # server refuses to start if empty
+      TRAFFIC_SALT: ${TRAFFIC_SALT:-}
+      TRAFFIC_WINDOW_MIN: ${TRAFFIC_WINDOW_MIN:-15}
+      TRAFFIC_MIN_VEHICLES: ${TRAFFIC_MIN_VEHICLES:-3}
+    volumes:
+      - ..:/repo:ro
+    ports:
+      - "8003:8003"
+    depends_on: [routing]
+    restart: unless-stopped
+
 volumes:
   nominatim-data:
   valhalla-data:

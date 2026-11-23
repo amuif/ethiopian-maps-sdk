@@ -3,4 +3,5 @@ packages:
   - 'glyphs'
   - 'react-native'
   - 'services'
+  - 'traffic'
   - 'examples/*'
