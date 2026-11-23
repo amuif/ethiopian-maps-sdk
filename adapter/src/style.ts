@@ -16,3 +16,46 @@ export function createBilingualStyle(options: StyleConfigOptions): Record<string
 
   return JSON.parse(styleString);
 }
+
+export interface TerrainOptions {
+  /** terrain.pmtiles location (https:// or file://), built by pipeline/scripts/build-terrain.sh */
+  url: string;
+  /** Drape the map on a 3D mesh. MapLibre GL JS only, so React Native leaves it off. Default true. */
+  terrain3d?: boolean;
+  exaggeration?: number;
+  /** Shaded relief layer (works on web and native). Default true. */
+  hillshade?: boolean;
+}
+
+/** Returns a copy of a style with Copernicus terrain added; base styles stay terrain-free so they work without the file. */
+export function addTerrain(
+  style: Record<string, any>,
+  { url, terrain3d = true, exaggeration = 1, hillshade = true }: TerrainOptions
+): Record<string, any> {
+  const layers = [...style.layers];
+  if (hillshade) {
+    // Relief sits on land/water fills, under roads, buildings and labels
+    const i = layers.findIndex((l) => ['line', 'symbol', 'fill-extrusion'].includes(l.type));
+    layers.splice(i < 0 ? layers.length : i, 0, {
+      id: 'hillshade',
+      type: 'hillshade',
+      source: 'terrain',
+      paint: { 'hillshade-exaggeration': 0.35, 'hillshade-shadow-color': '#5a5a5a' },
+    });
+  }
+  return {
+    ...style,
+    sources: {
+      ...style.sources,
+      terrain: {
+        type: 'raster-dem',
+        url: `pmtiles://${url}`,
+        tileSize: 512,
+        encoding: 'mapbox',
+        attribution: 'Copernicus GLO-30 © DLR e.V., © Airbus DS, provided under COPERNICUS by the EU and ESA',
+      },
+    },
+    layers,
+    ...(terrain3d ? { terrain: { source: 'terrain', exaggeration } } : {}),
+  };
+}

@@ -7,4 +7,8 @@ assert.equal(s.glyphs, 'file:///data/app/glyphs/{fontstack}/{range}.pbf');
 s = createNativeStyle({ pmtilesUrl: 'https://cdn.x/ethiopia.pmtiles', baseUrl: 'https://cdn.x', styleJson });
 assert.equal(s.sources.s.url, 'pmtiles://https://cdn.x/ethiopia.pmtiles');
 assert.throws(() => createNativeStyle({ pmtilesUrl: 'addis.pmtiles', baseUrl: 'https://cdn.x', styleJson }), /pmtilesUrl/);
+s = createNativeStyle({ pmtilesUrl: '/a.pmtiles', baseUrl: '/b', terrainUrl: '/t.pmtiles', styleJson: { ...styleJson, layers: [] } });
+assert.equal(s.sources.terrain.url, 'pmtiles://file:///t.pmtiles');
+assert.equal(s.terrain, undefined);
+assert.equal(s.layers[0].type, 'hillshade');
 console.log('ok');

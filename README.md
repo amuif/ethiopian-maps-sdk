@@ -151,6 +151,7 @@ bash tools/check-pmtiles/cli.sh https://tiles.yourdomain.et/ethiopia.pmtiles
 
 * [Self-Hosting Guide](docs/hosting-guide.md): Deploying on Cloudflare R2, AWS S3, Nginx, and MinIO.
 * [Mobile Offline Guide](docs/offline-guide.md): Bundling PMTiles into Android, iOS, Flutter and React Native.
+* [3D Buildings & Terrain](docs/3d-guide.md): Extruded buildings and Copernicus terrain on web and React Native.
 * [Self-Hosted Stack](docs/stack-guide.md): One-command Docker bundle for tiles, search and routing, plus the `@ethiopiamaps/services` client.
 * [Design Document](docs/designs/ethiopian_maps_sdk.md): Approved technical specification.
 

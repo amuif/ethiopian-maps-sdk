@@ -171,4 +171,4 @@ export function registerCompositeProtocol(
   return adapter;
 }
 
-export { createBilingualStyle, type StyleConfigOptions } from './style.js';
+export { addTerrain, createBilingualStyle, type StyleConfigOptions, type TerrainOptions } from './style.js';
