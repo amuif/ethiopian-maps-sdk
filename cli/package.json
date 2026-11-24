@@ -1,0 +1,21 @@
+{
+  "name": "@ethiopiamaps/cli",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ethiomap: build tiles, terrain and buildings, check hosting, serve locally",
+  "type": "module",
+  "bin": { "ethiomap": "dist/index.js" },
+  "scripts": {
+    "build": "tsc",
+    "test": "pnpm build && node test.mjs"
+  },
+  "author": "amuif (Ibrahim)",
+  "license": "MIT",
+  "dependencies": {
+    "effect": "^4.1.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "typescript": "^5.4.5"
+  }
+}

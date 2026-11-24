@@ -4,4 +4,5 @@ packages:
   - 'react-native'
   - 'services'
   - 'traffic'
+  - 'cli'
   - 'examples/*'

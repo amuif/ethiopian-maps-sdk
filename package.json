@@ -15,6 +15,8 @@
     "build:services": "pnpm --filter @ethiopiamaps/services build",
     "stack:up": "docker compose -f stack/docker-compose.yml up -d",
     "build:traffic": "pnpm --filter \"@ethiopiamaps/traffic...\" build",
+    "ethiomap": "node cli/dist/index.js",
+    "build:cli": "pnpm --filter @ethiopiamaps/cli build",
     "build:glyphs": "pnpm --filter @ethiopiamaps/glyphs build",
     "validate:styles": "gl-style-validate styles/ethiopia-bilingual.json && gl-style-validate styles/ethiopia-amharic.json",
     "test:diagnostic": "bash tools/check-pmtiles/cli.sh --help",

@@ -146,6 +146,18 @@ To verify that your Cloudflare R2 bucket or Nginx server emits the necessary COR
 bash tools/check-pmtiles/cli.sh https://tiles.yourdomain.et/ethiopia.pmtiles
 ```
 
+### `ethiomap` CLI
+
+One entry point for the pipeline and tools (run from a clone, after `pnpm install && pnpm build:cli`):
+
+```bash
+pnpm ethiomap build                 # Geofabrik OSM -> dist/ethiopia.pmtiles + city slices (needs Java 21, pmtiles)
+pnpm ethiomap terrain               # Copernicus -> dist/terrain.pmtiles
+pnpm ethiomap buildings             # Overture footprints -> dist/buildings.pmtiles (needs tippecanoe)
+pnpm ethiomap check https://tiles.yourdomain.et/ethiopia.pmtiles
+pnpm ethiomap serve                 # or: pnpm ethiomap stack up --traffic
+```
+
 ---
 
 ## Documentation
