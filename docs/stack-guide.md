@@ -47,7 +47,7 @@ map.addSource('route', { type: 'geojson', data: r.geometry });
 map.addLayer({ id: 'route', type: 'line', source: 'route', paint: { 'line-color': '#1f6f4a', 'line-width': 5 } });
 ```
 
-Pass more than two stops to route via waypoints. Turn instructions come from Valhalla's narrative languages, which don't include Amharic yet, so `language` defaults to `en-US`.
+Pass more than two stops to route via waypoints. Turn instructions come from Valhalla's narrative (`language` defaults to `en-US`). Valhalla has no Amharic, so `language: 'am'` builds Amharic instructions in the client from each maneuver's type and street name (`amharicInstruction()`). The phrases still need a review by a native speaker.
 
 To pick up new OSM data, rebuild the routing graph (the one-off job exits when done instead of serving):
 

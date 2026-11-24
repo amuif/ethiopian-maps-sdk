@@ -1,5 +1,6 @@
 import { Effect } from 'effect';
 import { fetchJson, trimBase } from './http.js';
+import { amharicInstruction, type ValhallaManeuver } from './amharic.js';
 
 export type LonLat = [number, number];
 export type Profile = 'auto' | 'motorcycle' | 'bicycle' | 'pedestrian';
@@ -8,7 +9,7 @@ export interface RouteOptions {
   /** Valhalla base URL, e.g. http://localhost:8002 from stack/docker-compose.yml */
   baseUrl: string;
   profile?: Profile;
-  /** Valhalla narrative language, e.g. `en-US` (default). Valhalla has no Amharic narrative yet. */
+  /** Instruction language: a Valhalla narrative language such as `en-US` (default), or `am`, which this package builds from maneuver types since Valhalla has no Amharic narrative. */
   language?: string;
   signal?: AbortSignal;
 }
@@ -54,18 +55,18 @@ interface ValhallaTrip {
     summary: { length: number; time: number };
     legs: {
       shape: string;
-      maneuvers: { instruction: string; length: number; time: number; begin_shape_index: number }[];
+      maneuvers: (ValhallaManeuver & { instruction: string; length: number; time: number; begin_shape_index: number })[];
     }[];
   };
 }
 
-export const toRoute = ({ trip }: ValhallaTrip): Route => {
+export const toRoute = ({ trip }: ValhallaTrip, language?: string): Route => {
   const coordinates: LonLat[] = [];
   const maneuvers: Maneuver[] = [];
   for (const leg of trip.legs) {
     const shape = decodePolyline(leg.shape);
     for (const m of leg.maneuvers) {
-      maneuvers.push({ instruction: m.instruction, distanceKm: m.length, durationS: m.time, location: shape[m.begin_shape_index] });
+      maneuvers.push({ instruction: language === 'am' ? amharicInstruction(m) : m.instruction, distanceKm: m.length, durationS: m.time, location: shape[m.begin_shape_index] });
     }
     // Consecutive legs share their joining point
     coordinates.push(...(coordinates.length ? shape.slice(1) : shape));
@@ -84,11 +85,11 @@ export const routeEffect = (stops: LonLat[], o: RouteOptions) =>
           body: JSON.stringify({
             locations: stops.map(([lon, lat]) => ({ lon, lat })),
             costing: o.profile ?? 'auto',
-            directions_options: { units: 'kilometers', language: o.language ?? 'en-US' },
+            directions_options: { units: 'kilometers', language: o.language && o.language !== 'am' ? o.language : 'en-US' },
           }),
           signal: o.signal,
         }
-      ).pipe(Effect.map(toRoute));
+      ).pipe(Effect.map((t) => toRoute(t, o.language)));
 
 /** Route through two or more [lon, lat] stops; `geometry` drops straight into a MapLibre GeoJSON source. */
 export const route = (stops: LonLat[], o: RouteOptions) => Effect.runPromise(routeEffect(stops, o));

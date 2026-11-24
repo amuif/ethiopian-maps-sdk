@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import http from 'node:http';
-import { search, reverse, route, decodePolyline, ServiceError } from './dist/index.js';
+import { search, reverse, route, decodePolyline, ServiceError, amharicInstruction } from './dist/index.js';
 
 // Fake Nominatim
 const seen = [];
@@ -20,7 +20,7 @@ const server = http.createServer((req, res) => {
     return req.on('end', () => {
       seen.push(JSON.parse(body));
       // Two legs sharing (38.75, 9.0); precision-6 shapes
-      const leg = (shape) => ({ shape, maneuvers: [{ instruction: 'Head north.', length: 1.2, time: 90, begin_shape_index: 0 }] });
+      const leg = (shape) => ({ shape, maneuvers: [{ type: 10, street_names: ['ቦሌ መንገድ'], instruction: 'Turn right onto ቦሌ መንገድ.', length: 1.2, time: 90, begin_shape_index: 0 }] });
       res.end(JSON.stringify({ trip: { summary: { length: 2.5, time: 200 }, legs: [leg(enc([[38.74, 9.01], [38.75, 9.0]])), leg(enc([[38.75, 9.0], [38.76, 9.02]]))] } }));
     });
   }
@@ -46,5 +46,10 @@ assert.deepEqual(r.geometry.coordinates, [[38.74, 9.01], [38.75, 9.0], [38.76, 9
 assert.equal(r.maneuvers.length, 2);
 assert.deepEqual(r.maneuvers[1].location, [38.75, 9.0]);
 assert.equal(seen.at(-1).costing, 'pedestrian');
+const am = await route([[38.74, 9.01], [38.76, 9.02]], { baseUrl, language: 'am' });
+assert.equal(seen.at(-1).directions_options.language, 'en-US');
+assert.equal(am.maneuvers[0].instruction, 'ወደ ቀኝ ታጠፍ፤ ቦሌ መንገድ።');
+assert.equal(amharicInstruction({ type: 26, roundabout_exit_count: 2 }), 'ወደ አደባባዩ ግባና በ2ኛው መውጫ ውጣ።');
+assert.equal(amharicInstruction({ type: 4, street_names: ['x'] }), 'መድረሻህ ደርሰሃል።');
 server.close();
 console.log('ok');
