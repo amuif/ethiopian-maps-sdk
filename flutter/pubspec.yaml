@@ -1,0 +1,22 @@
+name: ethiopia_maps
+description: Ethiopian Maps SDK for Flutter. Bilingual Amharic/English MapLibre styles over self-hosted PMTiles, online or offline.
+version: 0.1.0
+repository: https://github.com/amuif/ethiopian-maps-sdk
+
+environment:
+  sdk: ">=3.12.0 <4.0.0"
+  flutter: ">=3.44.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Reads pmtiles:// through MapLibre Native on Android and iOS
+  maplibre_gl: ^0.28.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  assets:
+    - assets/styles/

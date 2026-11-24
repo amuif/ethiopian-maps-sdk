@@ -163,7 +163,7 @@ pnpm ethiomap serve                 # or: pnpm ethiomap stack up --traffic
 ## Documentation
 
 * [Self-Hosting Guide](docs/hosting-guide.md): Deploying on Cloudflare R2, AWS S3, Nginx, and MinIO.
-* [Mobile Offline Guide](docs/offline-guide.md): Bundling PMTiles into Android, iOS, Flutter and React Native.
+* [Mobile Offline Guide](docs/offline-guide.md): The Android (`android/`), iOS (`ios/`), Flutter (`flutter/`) and React Native SDKs, online and offline.
 * [3D Buildings & Terrain](docs/3d-guide.md): Extruded buildings and Copernicus terrain on web and React Native.
 * [Live Traffic Plugin](docs/traffic-guide.md): Optional fleet-fed, anonymised road speeds.
 * [Self-Hosted Stack](docs/stack-guide.md): One-command Docker bundle for tiles, search and routing, plus the `@ethiopiamaps/services` client.
