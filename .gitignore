@@ -10,6 +10,7 @@ yarn-error.log*
 *.osm.pbf.md5
 *.pmtiles
 *.jar
+!android/gradle/wrapper/gradle-wrapper.jar
 planetiler.jar
 planetiler-data/
 data/
