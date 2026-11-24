@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import * as pmtiles from 'pmtiles';
+import { addBuildings } from '@ethiopiamaps/adapter/style';
 
 export interface CityConfig {
   id: string;
@@ -70,11 +71,17 @@ export default function EthiopiaMap({
           .replace(/\{BASE_URL\}/g, baseUrl)
           .replace(/\{PMTILES_URL\}/g, pmtilesUrl);
 
+        // Extra Microsoft/Google footprints (pipeline/scripts/build-buildings.sh) when dist/buildings.pmtiles exists
+        const buildingsUrl = `${baseUrl}/dist/buildings.pmtiles`;
+        const hasBuildings = await fetch(buildingsUrl, { method: 'HEAD' }).then((r) => r.ok, () => false);
+        let style: Record<string, any> = JSON.parse(parameterized);
+        if (hasBuildings) style = addBuildings(style, { url: buildingsUrl });
+
         const initialCity = CITIES.find((c) => c.id === selectedCity) ?? CITIES[1];
 
         const map = new maplibregl.Map({
           container: mapContainer.current!,
-          style: JSON.parse(parameterized),
+          style: style as maplibregl.StyleSpecification,
           center: initialCity.center,
           zoom: initialCity.zoom,
           hash: true

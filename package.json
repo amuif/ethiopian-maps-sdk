@@ -7,7 +7,7 @@
   "author": "amuif (Ibrahim)",
   "license": "MIT",
   "scripts": {
-    "start": "pnpm --filter ethiopian-maps-react-demo build && node tools/serve.js",
+    "start": "pnpm --filter \"ethiopian-maps-react-demo...\" build && node tools/serve.js",
     "serve": "node tools/serve.js",
     "dev:react": "pnpm --filter ethiopian-maps-react-demo dev",
     "build:adapter": "pnpm --filter @ethiopiamaps/adapter build",
