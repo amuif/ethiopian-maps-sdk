@@ -59,3 +59,24 @@ export function addTerrain(
     ...(terrain3d ? { terrain: { source: 'terrain', exaggeration } } : {}),
   };
 }
+
+/**
+ * Returns a copy of a style with the extra Microsoft/Google/Esri footprints from buildings.pmtiles
+ * (pipeline/scripts/build-buildings.sh) drawn like the OSM buildings: flat from z13, extruded from z15.
+ */
+export function addBuildings(style: Record<string, any>, { url }: { url: string }): Record<string, any> {
+  const layers: any[] = [];
+  for (const l of style.layers) {
+    layers.push(l);
+    // Clone each OSM building layer right after itself so draw order and paint stay identical
+    if (l['source-layer'] === 'building') layers.push({ ...l, id: `${l.id}-footprints`, source: 'buildings' });
+  }
+  return {
+    ...style,
+    sources: {
+      ...style.sources,
+      buildings: { type: 'vector', url: `pmtiles://${url}`, attribution: '© Overture Maps Foundation (Microsoft, Google, Esri)' },
+    },
+    layers,
+  };
+}

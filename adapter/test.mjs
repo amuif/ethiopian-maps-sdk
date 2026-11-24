@@ -27,3 +27,12 @@ assert.equal(n.terrain, undefined);
 assert.equal(n.layers.length, 3);
 assert.equal(base.layers.length, 3); // input untouched
 console.log('terrain ok');
+
+const { addBuildings } = await import('./dist/style.js');
+const bs = { sources: { omt: {} }, layers: [{ id: 'building', type: 'fill', source: 'omt', 'source-layer': 'building' }, { id: 'building-3d', type: 'fill-extrusion', source: 'omt', 'source-layer': 'building' }, { id: 'poi', type: 'symbol' }] };
+const b = addBuildings(bs, { url: 'https://x/buildings.pmtiles' });
+assert.deepEqual(b.layers.map((l) => l.id), ['building', 'building-footprints', 'building-3d', 'building-3d-footprints', 'poi']);
+assert.equal(b.layers[3].source, 'buildings');
+assert.equal(b.sources.buildings.url, 'pmtiles://https://x/buildings.pmtiles');
+assert.equal(bs.layers.length, 3);
+console.log('buildings ok');

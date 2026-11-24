@@ -15,6 +15,8 @@ export interface EthiopiaMapProps extends Omit<MapProps, 'mapStyle' | 'style'> {
   baseUrl: string;
   /** Optional terrain.pmtiles (remote or local) for shaded relief */
   terrainUrl?: string;
+  /** Optional buildings.pmtiles with Microsoft/Google footprints OSM lacks */
+  buildingsUrl?: string;
   language?: keyof typeof STYLES;
   initialViewState?: InitialViewState;
   style?: StyleProp<ViewStyle>;
@@ -26,6 +28,7 @@ export function EthiopiaMap({
   pmtilesUrl,
   baseUrl,
   terrainUrl,
+  buildingsUrl,
   language = 'bilingual',
   initialViewState = ADDIS,
   style,
@@ -33,8 +36,8 @@ export function EthiopiaMap({
   ...mapProps
 }: EthiopiaMapProps) {
   const mapStyle = useMemo(
-    () => createNativeStyle({ pmtilesUrl, baseUrl, terrainUrl, styleJson: STYLES[language] }),
-    [pmtilesUrl, baseUrl, terrainUrl, language]
+    () => createNativeStyle({ pmtilesUrl, baseUrl, terrainUrl, buildingsUrl, styleJson: STYLES[language] }),
+    [pmtilesUrl, baseUrl, terrainUrl, buildingsUrl, language]
   );
   return (
     <View style={[styles.fill, style]}>

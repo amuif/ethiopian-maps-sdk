@@ -11,4 +11,7 @@ s = createNativeStyle({ pmtilesUrl: '/a.pmtiles', baseUrl: '/b', terrainUrl: '/t
 assert.equal(s.sources.terrain.url, 'pmtiles://file:///t.pmtiles');
 assert.equal(s.terrain, undefined);
 assert.equal(s.layers[0].type, 'hillshade');
+s = createNativeStyle({ pmtilesUrl: '/a.pmtiles', baseUrl: '/b', buildingsUrl: '/bl.pmtiles', styleJson: { ...styleJson, layers: [{ id: 'building', 'source-layer': 'building' }] } });
+assert.equal(s.sources.buildings.url, 'pmtiles://file:///bl.pmtiles');
+assert.equal(s.layers[1].id, 'building-footprints');
 console.log('ok');
