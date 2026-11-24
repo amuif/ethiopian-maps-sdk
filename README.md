@@ -114,12 +114,20 @@ ethiopian-maps-sdk/
 │   ├── src/index.ts             # Composite local/remote PMTiles adapter
 │   ├── package.json             # @ethiopiamaps/adapter package definition
 │   └── tsconfig.json            # TypeScript build configuration
+├── react-native/
+│   ├── src/index.tsx            # <EthiopiaMap> for @maplibre/maplibre-react-native
+│   └── src/style.ts             # Style builder for remote or file:// archives
+├── services/                    # @ethiopiamaps/services: search & routing clients
+├── traffic/                     # Optional live-traffic plugin (Hono + Effect)
+├── stack/
+│   └── docker-compose.yml       # Tiles + Nominatim search + Valhalla routing (+ traffic profile)
 ├── tools/
 │   └── check-pmtiles/
 │       ├── cli.sh               # Terminal CORS & byte-range validator
 │       └── index.html           # Web diagnostic interface
 ├── examples/
 │   ├── web-react/               # Modern React map viewer application
+│   ├── expo/                    # Expo (React Native) dev-build demo
 │   └── web-vanilla/             # Minimal vanilla HTML/JS reference
 └── docs/
     ├── hosting-guide.md         # Deployment on Cloudflare R2, S3, Nginx, MinIO
@@ -138,12 +146,27 @@ To verify that your Cloudflare R2 bucket or Nginx server emits the necessary COR
 bash tools/check-pmtiles/cli.sh https://tiles.yourdomain.et/ethiopia.pmtiles
 ```
 
+### `ethiomap` CLI
+
+One entry point for the pipeline and tools (run from a clone, after `pnpm install && pnpm build:cli`):
+
+```bash
+pnpm ethiomap build                 # Geofabrik OSM -> dist/ethiopia.pmtiles + city slices (needs Java 21, pmtiles)
+pnpm ethiomap terrain               # Copernicus -> dist/terrain.pmtiles
+pnpm ethiomap buildings             # Overture footprints -> dist/buildings.pmtiles (needs tippecanoe)
+pnpm ethiomap check https://tiles.yourdomain.et/ethiopia.pmtiles
+pnpm ethiomap serve                 # or: pnpm ethiomap stack up --traffic
+```
+
 ---
 
 ## Documentation
 
 * [Self-Hosting Guide](docs/hosting-guide.md): Deploying on Cloudflare R2, AWS S3, Nginx, and MinIO.
-* [Mobile Offline Guide](docs/offline-guide.md): Bundling PMTiles into Android, iOS, and Flutter.
+* [Mobile Offline Guide](docs/offline-guide.md): The Android (`android/`), iOS (`ios/`), Flutter (`flutter/`) and React Native SDKs, online and offline.
+* [3D Buildings & Terrain](docs/3d-guide.md): Extruded buildings and Copernicus terrain on web and React Native.
+* [Live Traffic Plugin](docs/traffic-guide.md): Optional fleet-fed, anonymised road speeds.
+* [Self-Hosted Stack](docs/stack-guide.md): One-command Docker bundle for tiles, search and routing, plus the `@ethiopiamaps/services` client.
 * [Design Document](docs/designs/ethiopian_maps_sdk.md): Approved technical specification.
 
 ---

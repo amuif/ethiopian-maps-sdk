@@ -1,0 +1,24 @@
+{
+  "name": "@ethiopiamaps/services",
+  "version": "0.1.0",
+  "description": "Search and routing clients for the self-hosted Ethiopian Maps stack (web and React Native)",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "pnpm run build",
+    "test": "pnpm build && node test.mjs"
+  },
+  "author": "amuif (Ibrahim)",
+  "license": "MIT",
+  "dependencies": {
+    "effect": "^4.1.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

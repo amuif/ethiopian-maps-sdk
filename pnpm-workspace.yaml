@@ -1,4 +1,8 @@
 packages:
   - 'adapter'
   - 'glyphs'
+  - 'react-native'
+  - 'services'
+  - 'traffic'
+  - 'cli'
   - 'examples/*'

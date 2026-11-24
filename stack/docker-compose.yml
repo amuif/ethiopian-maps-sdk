@@ -1,0 +1,72 @@
+# Full self-hosted stack: `docker compose -f stack/docker-compose.yml up -d` from the repo root.
+# First start imports Ethiopia from Geofabrik; expect tens of minutes before search answers.
+name: ethiopiamaps
+
+x-pbf: &pbf https://download.geofabrik.de/africa/ethiopia-latest.osm.pbf
+
+services:
+  # Tiles, styles, glyphs, sprites in the published layout (same server as `pnpm serve`).
+  # shortcut: plain Node static server, put a CDN or Caddy in front for public traffic
+  tiles:
+    image: node:22-alpine
+    working_dir: /repo
+    command: node tools/serve.js
+    volumes:
+      - ..:/repo:ro
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+  # Geocoding (forward + reverse), Amharic via accept-language=am
+  search:
+    image: mediagis/nominatim:5.3
+    environment:
+      PBF_URL: *pbf
+      REPLICATION_URL: https://download.geofabrik.de/africa/ethiopia-updates/
+      NOMINATIM_PASSWORD: ${NOMINATIM_PASSWORD:-change-me}
+      IMPORT_STYLE: full
+    volumes:
+      - nominatim-data:/var/lib/postgresql/16/main
+    shm_size: 1g
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  # Turn-by-turn routing (car, motorbike, bicycle, foot); builds its graph from the same extract
+  routing:
+    image: ghcr.io/valhalla/valhalla-scripted:3.9.3
+    environment:
+      tile_urls: *pbf
+      build_elevation: "False"
+      traffic_name: traffic.tar # empty live-traffic skeleton the traffic plugin writes speeds into
+    volumes:
+      - valhalla-data:/custom_files
+    ports:
+      - "8002:8002"
+    restart: unless-stopped
+
+  # Optional live-traffic plugin: `docker compose -f stack/docker-compose.yml --profile traffic up -d`
+  # Needs `pnpm install && pnpm --filter "@ethiopiamaps/traffic..." build` on the host first.
+  traffic:
+    profiles: ["traffic"]
+    image: node:22-alpine
+    working_dir: /repo
+    command: node traffic/dist/server.js
+    environment:
+      VALHALLA_URL: http://routing:8002
+      TRAFFIC_INGEST_TOKEN: ${TRAFFIC_INGEST_TOKEN:-} # server refuses to start if empty
+      TRAFFIC_SALT: ${TRAFFIC_SALT:-}
+      TRAFFIC_WINDOW_MIN: ${TRAFFIC_WINDOW_MIN:-15}
+      TRAFFIC_MIN_VEHICLES: ${TRAFFIC_MIN_VEHICLES:-3}
+      VALHALLA_TRAFFIC_TAR: /valhalla/traffic.tar # routing picks up speeds live; unset to only colour the map
+    volumes:
+      - ..:/repo:ro
+      - valhalla-data:/valhalla
+    ports:
+      - "8003:8003"
+    depends_on: [routing]
+    restart: unless-stopped
+
+volumes:
+  nominatim-data:
+  valhalla-data:

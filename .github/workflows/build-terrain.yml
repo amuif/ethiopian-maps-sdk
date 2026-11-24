@@ -1,0 +1,51 @@
+name: Build and Release Terrain
+
+# Copernicus GLO-30 is a static dataset, so this runs on demand rather than weekly.
+on:
+  workflow_dispatch:
+    inputs:
+      max_zoom:
+        description: 'Max zoom (10 is ~700 MB; 11 is ~4x and can exceed the 2 GB asset limit)'
+        required: false
+        default: '10'
+
+permissions:
+  contents: write
+
+jobs:
+  build-terrain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Free runner disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/share/swift
+          df -h
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install pmtiles CLI
+        run: |
+          curl -sL https://github.com/protomaps/go-pmtiles/releases/download/v1.20.0/go-pmtiles_1.20.0_Linux_x86_64.tar.gz | tar -xz -C /usr/local/bin pmtiles
+          pmtiles version
+
+      - name: Build terrain.pmtiles
+        env:
+          TERRAIN_MAX_Z: ${{ inputs.max_zoom }}
+        run: bash pipeline/scripts/build-terrain.sh data/terrain dist
+
+      - name: Upload to the terrain release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="terrain-glo30"
+          gh release view "${TAG_NAME}" || gh release create "${TAG_NAME}" \
+            --title "Ethiopia Terrain (Copernicus GLO-30)" \
+            --notes "Terrain-RGB (Mapbox encoding, 512 px) from Copernicus GLO-30. © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved."
+          gh release upload "${TAG_NAME}" dist/terrain.pmtiles --clobber

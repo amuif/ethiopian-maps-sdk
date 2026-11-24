@@ -1,0 +1,17 @@
+import assert from 'node:assert';
+import { createNativeStyle } from './dist/style.js';
+const styleJson = { sources: { s: { type: 'vector', url: 'pmtiles://{PMTILES_URL}' } }, glyphs: '{BASE_URL}/glyphs/{fontstack}/{range}.pbf' };
+let s = createNativeStyle({ pmtilesUrl: '/data/app/addis.pmtiles', baseUrl: '/data/app/', styleJson });
+assert.equal(s.sources.s.url, 'pmtiles://file:///data/app/addis.pmtiles');
+assert.equal(s.glyphs, 'file:///data/app/glyphs/{fontstack}/{range}.pbf');
+s = createNativeStyle({ pmtilesUrl: 'https://cdn.x/ethiopia.pmtiles', baseUrl: 'https://cdn.x', styleJson });
+assert.equal(s.sources.s.url, 'pmtiles://https://cdn.x/ethiopia.pmtiles');
+assert.throws(() => createNativeStyle({ pmtilesUrl: 'addis.pmtiles', baseUrl: 'https://cdn.x', styleJson }), /pmtilesUrl/);
+s = createNativeStyle({ pmtilesUrl: '/a.pmtiles', baseUrl: '/b', terrainUrl: '/t.pmtiles', styleJson: { ...styleJson, layers: [] } });
+assert.equal(s.sources.terrain.url, 'pmtiles://file:///t.pmtiles');
+assert.equal(s.terrain, undefined);
+assert.equal(s.layers[0].type, 'hillshade');
+s = createNativeStyle({ pmtilesUrl: '/a.pmtiles', baseUrl: '/b', buildingsUrl: '/bl.pmtiles', styleJson: { ...styleJson, layers: [{ id: 'building', 'source-layer': 'building' }] } });
+assert.equal(s.sources.buildings.url, 'pmtiles://file:///bl.pmtiles');
+assert.equal(s.layers[1].id, 'building-footprints');
+console.log('ok');
