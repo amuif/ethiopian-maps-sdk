@@ -9,7 +9,8 @@
   "sources": {
     "openmaptiles": {
       "type": "vector",
-      "url": "pmtiles://{PMTILES_URL}"
+      "url": "pmtiles://{PMTILES_URL}",
+      "attribution": "<a href=\"https://www.openmaptiles.org/\" target=\"_blank\">© OpenMapTiles</a> <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\">© OpenStreetMap contributors</a>"
     }
   },
   "glyphs": "{BASE_URL}/glyphs/{fontstack}/{range}.pbf",

@@ -94,15 +94,12 @@ export default function EthiopiaMap({
           setMapLoaded(true);
         });
 
-        map.on('move', () => {
-          if (onMapMove) {
-            const center = map.getCenter();
-            onMapMove({
-              center: [center.lng, center.lat],
-              zoom: map.getZoom()
-            });
-          }
-        });
+        const emitMove = () => {
+          const center = map.getCenter();
+          onMapMove?.({ center: [center.lng, center.lat], zoom: map.getZoom() });
+        };
+        map.on('move', emitMove);
+        emitMove(); // URL hash may start the map somewhere other than the city default
 
         mapInstance.current = map;
       } catch (err) {
