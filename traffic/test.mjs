@@ -2,6 +2,10 @@ import assert from 'node:assert';
 import http from 'node:http';
 import { createApp, parseTrace } from './dist/app.js';
 import { TrafficStore, samplesFromMatch } from './dist/aggregate.js';
+import { writeLiveSpeeds, encodeSpeed, splitGraphId } from './dist/valhalla-tar.js';
+import { writeFileSync, readFileSync, mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 // Precision-6 polyline encoder for fake Valhalla shapes
 const enc = (pts) => { let o = '', pl = 0, pn = 0; const e = (v) => { v = v < 0 ? ~(v << 1) : v << 1; while (v >= 0x20) { o += String.fromCharCode((0x20 | (v & 0x1f)) + 63); v >>= 5; } o += String.fromCharCode(v + 63); };
@@ -10,7 +14,7 @@ const enc = (pts) => { let o = '', pl = 0, pn = 0; const e = (v) => { v = v < 0 
 // One 1.1 km edge; vehicle covers all of it in 120 s => 33 km/h vs 50 expected
 const match = {
   shape: enc([[38.74, 9.0], [38.745, 9.0], [38.75, 9.0]]),
-  edges: [{ way_id: 42, length: 1.1, speed: 50, begin_shape_index: 0, end_shape_index: 2 }],
+  edges: [{ id: 1 + 47701 * 8 + 130 * 2 ** 25, way_id: 42, length: 1.1, speed: 50, begin_shape_index: 0, end_shape_index: 2 }],
   matched_points: [
     { type: 'matched', edge_index: 0, distance_along_edge: 0 },
     { type: 'unmatched' },
@@ -61,12 +65,38 @@ assert.equal(fc.features.length, 1);
 assert.deepEqual(fc.features[0].properties, { wayId: 42, speedKmh: 33, expectedKmh: 50, ratio: 0.66, vehicles: 3 });
 assert.ok(!JSON.stringify(fc).includes('bus-'), 'vehicle ids must never be published');
 
+const live = store.liveSpeeds();
+assert.deepEqual([...live.entries()], [[match.edges[0].id, s.observedKmh]]);
+
 // Window expiry
 assert.equal(store.geojson(Date.now() + 16 * 60_000).features.length, 0);
 
 // Valhalla can't match => 422, nothing stored
 valhallaStatus = 400;
 assert.equal((await post({ vehicleId: 'bus-4', points })).status, 422);
+
+// traffic.tar: speeds land at header(32) + index*8 in the right tile entry
+assert.deepEqual(splitGraphId(match.edges[0].id), { level: 1, tile: 47701, index: 130 });
+const tarEntry = (name, edges) => {
+  const h = Buffer.alloc(512);
+  h.write(name, 0, 'latin1');
+  h.write((32 + edges * 8).toString(8).padStart(11, '0'), 124, 'latin1');
+  const body = Buffer.alloc(Math.ceil((32 + edges * 8) / 512) * 512);
+  body.writeUInt32LE(edges, 16);
+  return Buffer.concat([h, body]);
+};
+const dir = mkdtempSync(join(tmpdir(), 'tt-'));
+const tar = join(dir, 'traffic.tar');
+writeFileSync(tar, Buffer.concat([tarEntry('index.bin', 0), tarEntry('0/003/015.gph', 10), tarEntry('1/047/701.gph', 200), Buffer.alloc(1024)]));
+const speedAt = (b) => b.readBigUInt64LE(512 * 5 + 32 + 130 * 8); // index and 0/003/015 take 2 blocks each, then the 1/047/701 header block
+let prev = writeLiveSpeeds(tar, live, new Set(), 1_700_000_000_000);
+let bytes = readFileSync(tar);
+assert.equal(speedAt(bytes), encodeSpeed(33));
+assert.equal(Number(speedAt(bytes) & 0x7fn) << 1, 32); // 2 km/h resolution
+assert.equal(bytes.readBigUInt64LE(512 * 5 + 8), 1_700_000_000n); // last_update
+assert.equal(writeLiveSpeeds(tar, new Map([[1 + 47701 * 8 + 999 * 2 ** 25, 40]])).size, 0); // index past edge count: skipped
+writeLiveSpeeds(tar, new Map(), prev); // expired => cleared
+assert.equal(speedAt(readFileSync(tar)), 0n);
 
 valhalla.close();
 console.log('ok');

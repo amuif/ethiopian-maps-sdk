@@ -38,6 +38,7 @@ services:
     environment:
       tile_urls: *pbf
       build_elevation: "False"
+      traffic_name: traffic.tar # empty live-traffic skeleton the traffic plugin writes speeds into
     volumes:
       - valhalla-data:/custom_files
     ports:
@@ -57,8 +58,10 @@ services:
       TRAFFIC_SALT: ${TRAFFIC_SALT:-}
       TRAFFIC_WINDOW_MIN: ${TRAFFIC_WINDOW_MIN:-15}
       TRAFFIC_MIN_VEHICLES: ${TRAFFIC_MIN_VEHICLES:-3}
+      VALHALLA_TRAFFIC_TAR: /valhalla/traffic.tar # routing picks up speeds live; unset to only colour the map
     volumes:
       - ..:/repo:ro
+      - valhalla-data:/valhalla
     ports:
       - "8003:8003"
     depends_on: [routing]

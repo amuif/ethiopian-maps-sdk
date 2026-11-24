@@ -16,6 +16,8 @@ docker compose -f stack/docker-compose.yml --profile traffic up -d   # port 8003
 | `TRAFFIC_SALT` | required | Secret mixed into vehicle-id hashes. Rotating it unlinks old hashes |
 | `TRAFFIC_WINDOW_MIN` | 15 | How long a speed observation counts |
 | `TRAFFIC_MIN_VEHICLES` | 3 | A segment is published only once this many distinct vehicles have crossed it in the window |
+| `VALHALLA_TRAFFIC_TAR` | set in compose | Path to Valhalla's `traffic.tar`. When set, live speeds feed routing |
+| `TRAFFIC_TAR_INTERVAL_S` | 60 | How often speeds are written to `traffic.tar` |
 
 ## Send traces
 
@@ -41,6 +43,16 @@ setInterval(() => map.getSource('traffic').setData('http://localhost:8003/v1/tra
 
 On React Native, use `<GeoJSONSource data={url}>` with a `<Layer {...trafficLayer()} />` child. Lines are offset to the right of the direction of travel (Ethiopia drives on the right), so the two directions show side by side.
 
+## Route with it
+
+The routing service builds an empty `traffic.tar` (`traffic_name` in compose). Every minute the plugin writes the same k-anonymous median speeds into it, keyed by Valhalla edge ID. Valhalla memory-maps the file, so routes use the new speeds without a restart. Segments whose observations expire go back to Valhalla's default speeds.
+
+```ts
+await route(stops, { baseUrl: 'http://localhost:8002', liveTraffic: true }); // departs now, uses live speeds
+```
+
+An existing routing volume has no `traffic.tar`. After adding `traffic_name`, rebuild it once: `docker compose -f stack/docker-compose.yml run --rm -e force_rebuild=True -e serve_tiles=False routing`. Each graph rebuild makes a fresh empty `traffic.tar`, and the plugin refills it within one interval.
+
 ## Privacy
 
 - Raw points are discarded as soon as a trace is matched. Only `{segment, speed, salted vehicle hash, timestamp}` is kept, in memory, for one window.
@@ -50,6 +62,6 @@ On React Native, use `<GeoJSONSource data={url}>` with a `<Layer {...trafficLaye
 
 ## Limits
 
-- **Routing doesn't use live speeds yet.** Valhalla needs a `traffic.tar` keyed by its internal edge IDs to do that. Today the speeds only colour the map.
+- Speeds are uniform per edge, at Valhalla's 2 km/h resolution. Partial-edge congestion isn't modelled.
 - Observations are held in memory, so a restart loses at most one window. Use a shared store if you run several instances.
 - A vehicle needs two or more GPS points on the same road segment to yield a speed, so very short segments fill in only with dense (≤ 10 s) sampling.

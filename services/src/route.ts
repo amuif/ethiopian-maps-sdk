@@ -11,6 +11,8 @@ export interface RouteOptions {
   profile?: Profile;
   /** Instruction language: a Valhalla narrative language such as `en-US` (default), or `am`, which this package builds from maneuver types since Valhalla has no Amharic narrative. */
   language?: string;
+  /** Use live traffic speeds (needs the traffic plugin writing Valhalla's traffic.tar). Departs now. */
+  liveTraffic?: boolean;
   signal?: AbortSignal;
 }
 
@@ -85,6 +87,7 @@ export const routeEffect = (stops: LonLat[], o: RouteOptions) =>
           body: JSON.stringify({
             locations: stops.map(([lon, lat]) => ({ lon, lat })),
             costing: o.profile ?? 'auto',
+            ...(o.liveTraffic && { date_time: { type: 0 } }),
             directions_options: { units: 'kilometers', language: o.language && o.language !== 'am' ? o.language : 'en-US' },
           }),
           signal: o.signal,

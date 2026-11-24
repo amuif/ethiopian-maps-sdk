@@ -55,7 +55,7 @@ const matchTrace = (cfg: TrafficConfig, points: Point[]) =>
           use_timestamps: true,
           filters: {
             action: 'include',
-            attributes: ['edge.way_id', 'edge.length', 'edge.speed', 'edge.begin_shape_index', 'edge.end_shape_index',
+            attributes: ['edge.id', 'edge.way_id', 'edge.length', 'edge.speed', 'edge.begin_shape_index', 'edge.end_shape_index',
               'matched.type', 'matched.edge_index', 'matched.distance_along_edge', 'shape'],
           },
         }),
